@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/740960158.svg)](https://zenodo.org/doi/10.5281/zenodo.10688128)
+
 # Mara_Pub
 Code and data to replicate the Mara analysis (DOI to be updated)
 
