@@ -70,10 +70,10 @@ ranLevels = list(sample = rL.sample, month = rL.temporal, plot = rL.spatial)
 
 #  ----------------------------------- model construction and fitting with Bayesian inference ---------------------------------- #
 # Fitting the four alternative HMSC models with increasing thinning
-samples = 1000
+samples = 4000
 nChains = 4
 thin = 1000
-nParallel = 2
+nParallel = 4
 ModelDir = file.path(getwd(), "Hmsc_model")
 
 run.model = FALSE
