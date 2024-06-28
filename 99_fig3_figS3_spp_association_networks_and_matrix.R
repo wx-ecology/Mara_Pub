@@ -33,7 +33,7 @@ raw_count <- read_rds("./data/mara_animal_compiled.rds") %>%
 raw_cor <- raw_count %>%
   as.matrix(.) %>% # 1,455 x 35. Some months/sites missing values. Dropped. 
   cor(.) 
-hmsc_hi <- readRDS("./data/Hmsc_network_95.RDS") 
+hmsc_hi <- readRDS("./data/Hmsc_network_95_R1.RDS") 
 copula_partcor <- readRDS("./data/ecoCopula_partcor_network.RDS") 
 
 #########################################################
@@ -49,7 +49,7 @@ c <- ggcorrplot(copula_partcor, type = "lower", ggtheme = ggplot2::theme_minimal
                 colors = c("#b2182b", "white","#2166ac"), 
                 lab = TRUE, digits = 2, lab_size = 3, show.legend = F, tl.cex = 10)
 
-ggsave("./figures/materials/mara_corrplot_2.png", grid.arrange(a, b, c, nrow = 2),
+ggsave("./figures/materials/mara_corrplot_2_R1.png", grid.arrange(a, b, c, nrow = 2),
        width = 12, height = 10, device = ragg::agg_png)
 
 ##################################
@@ -61,11 +61,11 @@ raw_cor <- raw_cor %>% graph_from_cor(.)
 
 copula_igraph_partcor <- copula_partcor  %>% graph_from_cor(.)
 
-hmsc_igraph_hi <- hmsc_hi%>% graph_from_cor(.)  # posterior probability of the correlation estimate to be true is greater than 95%
+hmsc_igraph_hi <- hmsc_hi %>% graph_from_cor(.)  # posterior probability of the correlation estimate to be true is greater than 95%
 
-# get node cooordinates so the two graphs will have the same node loactions
+# get node cooordinates so the two graphs will have the same node locations
 seed = 1
-Coords <- layout_with_kk(copula_igraph_partcor) %>% 
+Coords <- layout_with_kk(raw_cor) %>% 
   as_tibble %>%
   bind_cols(tibble(names = names(V(copula_igraph_partcor))))
 # name the lay out better
@@ -125,7 +125,7 @@ c <- copula_igraph_partcor %>%
     plot.margin = margin(1, 1.5, 1, 1, "cm")
   )
 
-ggsave("./figures/materials/mara_graph.png", grid.arrange(a, b, c, nrow = 1),
+ggsave("./figures/materials/mara_graph_R1.png", grid.arrange(a, b, c, nrow = 1),
        width = 13, height = 6, device = ragg::agg_png)
 
 ##########################################

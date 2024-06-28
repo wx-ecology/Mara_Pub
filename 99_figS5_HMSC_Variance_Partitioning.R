@@ -4,7 +4,7 @@ pal8 = c("#827580", "#e6dae4" , "#74e3c4", "#74c7e3","#429EBD", "#053F5C", "#F7A
 library(ggplot2)
 library(tidyverse)
 
-df <- readRDS("./data/Hmsc_VP.RDS")
+df <- readRDS("./data/Hmsc_VP_R1.RDS")
 df <- df$vals
 df <- data.frame(variable = row.names(df), df) %>%
   pivot_longer(cols = 2:13, names_to = "species", values_to = "value") %>%
@@ -35,5 +35,5 @@ p <- ggplot(df, aes(fill = variable, y = value, x = species )) +
          strip.text = element_blank()) +
   guides(fill = guide_legend(nrow = 2, reverse = T)) +
   coord_flip()
-ggsave("./figures/hmsc_vp2.png", p,
+ggsave("./figures/hmsc_vp2_R1.png", p,
         width = 20, height = 8, device = ragg::agg_png)

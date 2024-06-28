@@ -5,9 +5,13 @@ library(Hmsc)
 library(bbplot)
 library(cowplot)
 
-prediction <- readRDS("./data/Hmsc_prediction.RDS")
-pred_dry <- prediction$predY_dry
-pred_wet <- prediction$predY_wet
+prediction <- readRDS("./data/Hmsc_prediction_R1.RDS")
+
+# 16000 predictions (4000 samples for each )
+set.seed(1)
+random.index <- sample(1:16000, 4000)
+pred_dry <- prediction$predY_dry[random.index]
+#pred_wet <- prediction$predY_wet
 
 ## --- function turn HMSC prediction result list to data frame ---- ###
 predlist.to.df <- function(pred.list) {
@@ -24,7 +28,7 @@ p_funs <- map(p, ~partial(quantile, probs = .x, na.rm = TRUE)) %>%
   set_names(nm = p_names)
 
 # obtain distance gradient # 
-xx = seq(from = 1, to = 12, length = 20)
+xx = seq(from = 1, to = 12, length = 12)
 xx.df <- data.frame(xx = xx) %>% 
   mutate(dist = row_number())
 
@@ -34,21 +38,18 @@ pred.df <- predlist.to.df(pred_dry) %>%  left_join(., xx.df)
 ## ------- create ribbom plots of all species abundance in wet month ------ ##
 # get CIs
 pred.CI <- pred.df %>%
-  pivot_longer(2:13, "species", "value") %>%
+  pivot_longer(2:13, names_to = "species", values_to = "value") %>%
   select(-dist, -index) %>%
   mutate(across(everything(),type.convert)) %>% 
   group_by(xx, species) %>%
   summarise(across(everything(),p_funs)) 
 
-pred.CI %>% ggplot (aes (x = xx, y = value_50, group = species, color = species, fill = species)) +
-  geom_ribbon(aes( ymin = value_5, ymax = value_95), alpha = 0.2)
-
 # pred.CI %>%
-#   #filter(species != "Wildebeest") %>% 
+#   #filter(species != "Wildebeest") %>%
 #   ggplot (aes (x = xx, y = value_50, group = species)) +
-#   geom_ribbon(aes( ymin = value_5, ymax = value_95, fill = species), alpha = 0.2) 
+#   geom_ribbon(aes( ymin = value_5, ymax = value_95, fill = species), alpha = 0.2)
 
-## ------- create line plots of catle, wildebeest, and zebra in dry mont ------ ##
+## ------- create line plots of cattle, wildebeest, and zebra in dry month ------ ##
 #  5% - 95% quantiles of draws 
 good.index.cattle <-  pred.df %>% 
   filter(dist == 1) %>%
@@ -75,7 +76,7 @@ p.c <- pred.df %>%
   geom_line(alpha = 0.1, color = "#fd7f6f")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Cattle") + 
+  labs(subtitle = "Predicted cattle occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -90,7 +91,7 @@ p.w <- pred.df %>%
   geom_line(alpha = 0.1, color = "#7eb0d5")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Wildebeest") + 
+  labs(subtitle = "Predicted wildebeest occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -105,7 +106,7 @@ p.z <- pred.df %>%
   geom_line(alpha = 0.1, color =  "#8bd3c7") +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Zebra") + 
+  labs(subtitle = "Predicted zebra occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -115,7 +116,7 @@ p.z <- pred.df %>%
 
 p <- plot_grid(p.c, p.z, p.w, nrow = 1)
 
-ggsave("./figures/materials/HMSC_prediction_3spp.png", p, 
+ggsave("./figures/materials/HMSC_prediction_3spp_R1.png", p, 
        width = 20, height = 4, device = ragg::agg_png)
 
 
@@ -182,7 +183,7 @@ p.tg <- pred.df %>%
   geom_line(alpha = 0.1, color = "#b2e061")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Thompsons's gazelle") + 
+  labs(subtitle = "Thompsons's gazelle occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -197,7 +198,7 @@ p.tp <- pred.df %>%
   geom_line(alpha = 0.1, color = "#7eb0d5")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Topi") + 
+  labs(subtitle = "Topi occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -213,7 +214,7 @@ p.e <- pred.df %>%
   geom_line(alpha = 0.1, color = "#BF7E7E")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Eland") + 
+  labs(subtitle = "Eland occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -228,7 +229,7 @@ p.gg <- pred.df %>%
   geom_line(alpha = 0.1, color = "#ffee65")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Grant's gazelle") + 
+  labs(subtitle = "Grant's gazelle occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -244,7 +245,7 @@ p.buffalo <- pred.df %>%
   geom_line(alpha = 0.1, color = "#fdcce5")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Buffalo") + 
+  labs(subtitle = "Buffalo occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -259,7 +260,7 @@ p.waterbuck <- pred.df %>%
   geom_line(alpha = 0.1, color = "#E9C09B")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Waterbuck") + 
+  labs(subtitle = "Waterbuck occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -274,7 +275,7 @@ p.dikdik <- pred.df %>%
   geom_line(alpha = 0.1, color = "#bd7ebe")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Dik dik") + 
+  labs(subtitle = "Dik dik occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -289,7 +290,7 @@ p.elephant <- pred.df %>%
   geom_line(alpha = 0.1, color = "#ffb55a")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Elephant") + 
+  labs(subtitle = "Elephant occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -304,7 +305,7 @@ p.impala <- pred.df %>%
   geom_line(alpha = 0.1, color = "#beb9db")  +
   xlab("Distance to boundary (km)") +
   scale_x_continuous(breaks = c(3,6,9,12), labels = c(3,6,9,12)) +
-  labs(subtitle = "Impala") + 
+  labs(subtitle = "Impala occurrence") + 
   bbplot::bbc_style() +
   theme (axis.text.x =  element_text(size=14),
          axis.text = element_text(size = 14),
@@ -315,5 +316,5 @@ p.impala <- pred.df %>%
 p2 <- plot_grid(p.buffalo, p.dikdik, p.e, p.elephant, p.gg, p.impala,
                 p.tg, p.tp, p.waterbuck, ncol = 3)
 
-ggsave("./figures/materials/supp_spp_prediction_9spp.png", p2, 
+ggsave("./figures/materials/supp_spp_prediction_9spp_R1.png", p2, 
        width = 16, height = 16, device = ragg::agg_png) 
