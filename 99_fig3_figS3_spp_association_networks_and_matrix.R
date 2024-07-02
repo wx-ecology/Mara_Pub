@@ -1,4 +1,4 @@
-## this script create a figure comparing the HMSC derived spp covariance with the ecoCopula derived spp network 
+## this script create a figure comparing raw correlation, HMSC derived spp covariance, abd ecoCopula derived spp network 
 
 #  ----------  read library ----------# 
 library(ggraph)
@@ -37,7 +37,7 @@ hmsc_hi <- readRDS("./data/Hmsc_network_95_R1.RDS")
 copula_partcor <- readRDS("./data/ecoCopula_partcor_network.RDS") 
 
 #########################################################
-######## supp figure S3 with correlation matrix #########
+############# supp figure correlation matrix ############
 #########################################################
 a <- ggcorrplot(raw_cor, type = "lower", ggtheme = ggplot2::theme_minimal,  
                 colors = c("#b2182b", "white","#2166ac"),
@@ -49,8 +49,8 @@ c <- ggcorrplot(copula_partcor, type = "lower", ggtheme = ggplot2::theme_minimal
                 colors = c("#b2182b", "white","#2166ac"), 
                 lab = TRUE, digits = 2, lab_size = 3, show.legend = F, tl.cex = 10)
 
-ggsave("./figures/materials/mara_corrplot_2_R1.png", grid.arrange(a, b, c, nrow = 2),
-       width = 12, height = 10, device = ragg::agg_png)
+# ggsave("./figures/materials/mara_corrplot_2_R1.png", grid.arrange(a, b, c, nrow = 2),
+#        width = 12, height = 10, device = ragg::agg_png)
 
 ##################################
 ########## plot networks #########
@@ -125,12 +125,13 @@ c <- copula_igraph_partcor %>%
     plot.margin = margin(1, 1.5, 1, 1, "cm")
   )
 
-ggsave("./figures/materials/mara_graph_R1.png", grid.arrange(a, b, c, nrow = 1),
-       width = 13, height = 6, device = ragg::agg_png)
+# ggsave("./figures/materials/mara_graph_R1.png", grid.arrange(a, b, c, nrow = 1),
+#        width = 13, height = 6, device = ragg::agg_png)
 
 ##########################################
 ########### descriptive stats ############
-##########################################
+##################################ß########
+# any species with negative association with cattle? 
 raw_cor_tb <- raw_cor %>% as_tibble(.) %>% 
   mutate(spp2 = rownames(raw_cor)) %>% select(Cattle, spp2)
 raw_cor_tb %>% filter(Cattle < 0)
@@ -139,6 +140,6 @@ hmsc_hi_tb <- hmsc_hi %>% as_tibble(.) %>%
   mutate(spp2 = rownames(hmsc_hi)) %>% select(Cattle, spp2)
 hmsc_hi_tb %>% filter(Cattle < 0)
 
-copula_partcor_tb <- copula_partcor %>% as_tibble(.) %>% 
+copula_partcor_tb <- copula_partcor %>% ßas_tibble(.) %>% 
   mutate(spp2 = rownames(copula_partcor)) %>% select(Cattle, spp2)
 copula_partcor_tb %>% filter(Cattle < 0)
