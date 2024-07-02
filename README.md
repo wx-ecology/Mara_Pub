@@ -1,9 +1,10 @@
 [![DOI](https://zenodo.org/badge/740960158.svg)](https://zenodo.org/doi/10.5281/zenodo.10688128)
 
-# Mara_Pub
+# Rethinking livestock encroachment: code and data
 Code and data to replicate the Mara analysis (DOI to be updated)
 
-## Rethinking livestock encroachment at a protected area boundary
+## Article title: Rethinking Livestock Encroachment at a Protected Area Boundary
+- Wenjing Xu and Bilal Butt
 
 ## **Data**
 
